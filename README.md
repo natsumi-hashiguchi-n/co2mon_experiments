@@ -54,3 +54,12 @@ docker exec -it co2mon /bin/bash
 ```
 /dev/serial/by-path/platform-fd500000.pcie-pci-0000\:01\:00.0-usb-0\:1.1\:1.0
 ```
+
+## メモ
+
+### USBシリアルデバイスの自動判別(案)
+
+- `/dev/serial/by-path` 以下にすべてのシリアルデバイスが列挙される
+- `tail -n 10`でファイルに10行読み出す
+- 3秒経ったらtailのプロセスをkillしてwaitする
+- 読みだしたファイルの中身をみてデバイスの種類を判別する
