@@ -28,6 +28,18 @@ docker image save co2mon | ssh cm01.local docker image load
 docker run -d --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co2mon co2mon /sbin/init
 ```
 
+**ビルドして転送して起動**
+
+```
+./docker_build.sh && (docker image save co2mon | pv | ssh cm01.local docker image load) && ssh cm01.local 'docker stop co2mon; docker run -d --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co2mon co2mon /sbin/init'
+```
+
+または,
+
+```sh
+./build_send_run.sh
+```
+
 ## コンテナのシェルを開く
 
 ```sh
