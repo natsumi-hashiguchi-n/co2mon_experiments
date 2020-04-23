@@ -43,7 +43,7 @@ docker run -d --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co
 ## コンテナのシェルを開く
 
 ```sh
-docker exec -it co2mon /bin/bash
+docker exec -it co2mon /bin/bash --login
 ```
 
 ## USBコネクタ
