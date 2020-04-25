@@ -69,6 +69,12 @@ docker exec -it co2mon /bin/bash --login
 
 ## メモ
 
+### GPSの読み出し
+
+```sh
+gpspipe -w | jq -c --unbuffered 'select(.class == "TPV")' | while read -r l; do printf '%s %s\n' "$(date +%s)" "${l}"; done
+```
+
 ### USBシリアルデバイスの自動判別(案)
 
 - `/dev/serial/by-path` 以下にすべてのシリアルデバイスが列挙される

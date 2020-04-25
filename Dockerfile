@@ -17,7 +17,10 @@ COPY ./app/gpsd.service /etc/systemd/system/gpsd.service
 RUN systemctl disable gpsd.socket
 RUN systemctl enable gpsd.service
 
-# 読み出しサービスの設定を行う
+COPY ./app/cm-read-gps.service /etc/systemd/system/
+RUN systemctl enable cm-read-gps.service
+
+# 送信サービスの設定を行う
 
 STOPSIGNAL SIGRTMIN+3
 CMD [ "/sbin/init" ]
