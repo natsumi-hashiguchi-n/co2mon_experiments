@@ -69,6 +69,16 @@ docker exec -it co2mon /bin/bash --login
 
 ## メモ
 
+### デバッグ用
+
+```sh
+# shell
+ssh cm01.local -t "screen -d shell; screen -r shell || screen -S shell"
+
+# docker ps
+ssh cm01.local -t 'screen -d dockerps; screen -r dockerps || screen -S dockerps ./dockerps.sh'
+```
+
 ### GPSの読み出し
 
 ```sh
