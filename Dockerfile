@@ -20,7 +20,9 @@ RUN systemctl enable gpsd.service
 COPY ./app/cm-read-gps.service /etc/systemd/system/
 RUN systemctl enable cm-read-gps.service
 
-# 送信サービスの設定を行う
+# ビーコン送信サービスの設定
+COPY ./app/cm-send-beacon.service /etc/systemd/system/
+RUN systemctl enable cm-send-beacon.service
 
 STOPSIGNAL SIGRTMIN+3
 CMD [ "/sbin/init" ]
