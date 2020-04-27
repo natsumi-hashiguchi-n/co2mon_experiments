@@ -45,7 +45,8 @@ fi
 ## エンドポイント情報を取得する
 curl -sX POST "$(cat "${tmp}"/original_url)" > "${tmp}"/endpoint_json ||
   error 'endpoint_json の取得に失敗しました'
-jq -r 'to_entries | map("\(.key): \(.value)") | .[]' < "${tmp}"/endpoint_json
+jq -r 'to_entries | map("\(.key): \(.value)") | .[]' < "${tmp}"/endpoint_json |
+  tr -d '\r'
 
 # ここで通常の終了処理
 on_exit
