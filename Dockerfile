@@ -2,6 +2,7 @@ FROM debian:buster-slim
 
 ENV DEBIAN_FRONTEND noninteractive
 
+COPY ./app/sources.list /etc/apt/sources.list
 RUN apt-get -y update && \
     apt-get -y install systemd jq ca-certificates curl gpsd gpsd-clients && \
     rm -rf /var/lib/apt/lists/*
