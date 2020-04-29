@@ -4,6 +4,12 @@ Hec-EyeにつながるCO2モニタ
 
 ## ビルド
 
+Docker.appの設定から、`Command Line > Enable Experimental features`を有効にしておく必要があります。
+
+![enable_experimental_feature](docker_config.png)
+
+設定が済んだら、
+
 ```sh
 docker buildx create --use         # 最初の1回のみ
 docker buildx inspect --bootstrap  # 最初の1回のみ
@@ -44,6 +50,20 @@ docker run -d --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co
 
 ```sh
 docker exec -it co2mon /bin/bash --login
+```
+
+## RPi上のDATAディレクトリからローカルに同期する
+
+ローカルの`DATA`は削除されるので注意
+
+```sh
+./sync_data_from_remote.sh
+```
+
+## send_graph.sh 単体をローカルでデバッグ
+
+```sh
+./docker_build.sh && (docker run --rm -v $(pwd)/TMP:/workdir/TMP -v $(pwd)/DATA:/var/local/co2mon/DATA co2mon sh -x /workdir/app/send_graph.sh)
 ```
 
 ## USBコネクタ
