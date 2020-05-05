@@ -52,6 +52,12 @@ docker run -d --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co
 docker exec -it co2mon /bin/bash --login
 ```
 
+## ホスト用のserviceファイルを転送する
+
+```sh
+(ssh cm01.local 'sudo tee /etc/systemd/system/co2mon.service') < co2mon.service
+```
+
 ## RPi上のDATAディレクトリからローカルに同期する
 
 ローカルの`DATA`は削除されるので注意
