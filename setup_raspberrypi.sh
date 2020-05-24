@@ -309,7 +309,7 @@ StartLimitBurst=0
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl enable co2mon.service
+sudo systemctl enable co2mon.service
 
 # ホスト名の設定
 sudo raspi-config nonint do_hostname "${NEW_HOSTNAME}"
