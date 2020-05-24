@@ -30,8 +30,8 @@ chmod 600 /home/pi/.ssh/authorized_keys
 ssh-keygen -t ed25519 -f /home/pi/.ssh/id_ed25519 -P ''
 
 # sshリバースフォワードの設定
-#if [ -n "${SSH_RPFW_SERVER}" ] && [ -n "${SSH_RPFW_PORT}" ] && [ -n "${SSH_RPFW_HOST_KEY}" ]; then
-if [ -n "${SSH_RPFW_SERVER}" ] && [ -n "${SSH_RPFW_PORT}" ]; then
+#if [ -n "${SSH_RPFW_SERVER-}" ] && [ -n "${SSH_RPFW_PORT-}" ] && [ -n "${SSH_RPFW_HOST_KEY-}" ]; then
+if [ -n "${SSH_RPFW_SERVER-}" ] && [ -n "${SSH_RPFW_PORT-}" ]; then
   sudo tee /etc/systemd/system/ssh-rpfw.service <<EOF
 [Unit]
 Description=ssh reverse port forwarding service
