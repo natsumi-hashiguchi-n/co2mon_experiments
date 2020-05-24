@@ -27,7 +27,8 @@ touch /Volumes/boot/ssh
 diskutil eject /dev/disk2
 ```
 
-起動してシェルログインできたら、以下のコマンドを実行する
+起動してシェルログインできたら、以下のコマンドを実行する。
+（Ethernetなど、安定した回線で実行するのがおすすめ）
 
 ```
 export GITHUB_USERNAME=<your username>
