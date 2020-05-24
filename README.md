@@ -18,7 +18,16 @@ docker buildx inspect --bootstrap  # 最初の1回のみ
 
 ## RaspberryPiのセットアップ
 
-Raspbianのシェルで以下のコマンドを実行する
+microSDの書き込み
+
+```sh
+diskutil unmountDisk /dev/disk2
+sudo dd if=~/Downloads/2020-02-13-raspbian-buster-lite.img of=/dev/rdisk2 bs=1m; say 'オワッタヨ'
+touch /Volumes/boot/ssh
+diskutil eject /dev/disk2
+```
+
+起動してシェルログインできたら、以下のコマンドを実行する
 
 ```
 export GITHUB_USERNAME=<your username>
