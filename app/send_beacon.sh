@@ -43,7 +43,7 @@ tail -n 1 /var/local/co2mon/DATA/log/gps_tpv |
   jq '{"lat": .lat, "lng": .lon, "alt": .alt, "direction": 0}' |
   #jq --arg type "${type}" '. + {"type": $type}' |
   jq --arg type "default" '. + {"type": $type}' |
-  jq --arg co2 "${co2}" '. + {"additional": {"co2": $co2}}' |
+  jq --arg co2 "${co2}" '. + {"additional": {"info": {"co2": $co2}}}' |
   curl -s -w '\n' -H "Content-type: application/json" -d @- "${info_url}?token=${token}"
 
 # ここで通常の終了処理
