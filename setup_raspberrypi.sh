@@ -43,7 +43,7 @@ After=network.target auditd.service
 User=pi
 Group=pi
 WorkingDirectory=/home/pi
-ExecStart=/usr/bin/ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o TCPKeepAlive=no -N -R ${SSH_RPFW_PORT}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 -p ${SSH_RPFW_SERVER_PORT} ${SSH_RPFW_SERVER}
+ExecStart=/usr/bin/ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o TCPKeepAlive=no -N -R ${SSH_RPFW_PORT}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 -p ${SSH_RPFW_SERVER_PORT} debian@${SSH_RPFW_SERVER}
 Restart=always
 RestartSec=1
 StartLimitBurst=0
