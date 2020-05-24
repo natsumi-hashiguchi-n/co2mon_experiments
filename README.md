@@ -16,6 +16,16 @@ docker buildx inspect --bootstrap  # 最初の1回のみ
 ./docker_build.sh
 ```
 
+## RaspberryPiのセットアップ
+
+Raspbianのシェルで以下のコマンドを実行する
+
+```
+export GITHUB_USERNAME=<your username>
+export NEW_HOSTNAME=<new hostname>
+curl -s https://raw.githubusercontent.com/realglobe-Inc/co2mon/master/setup_raspberrypi.sh | sh -s
+```
+
 ## DockerイメージをRaspberryPiに転送する
 
 ```sh
