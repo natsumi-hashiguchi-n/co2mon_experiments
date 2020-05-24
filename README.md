@@ -102,7 +102,7 @@ docker exec -it co2mon /bin/bash --login
 ssh cm01.local -t "screen -d shell; screen -r shell || screen -S shell"
 
 # docker ps
-ssh cm01.local -t 'screen -d dockerps; screen -r dockerps || screen -S dockerps ./dockerps.sh'
+ssh cm01 -t 'screen -d dockerps; screen -r dockerps || screen -S dockerps sh -c "while :; do r=\$(docker ps); clear; echo \"\${r}\"; sleep 5; done"'
 ```
 
 ### GPSの読み出し
