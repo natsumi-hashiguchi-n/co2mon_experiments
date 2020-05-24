@@ -4,6 +4,9 @@
 # USAGE 使い方:
 #   pi@raspberrypi$ export GITHUB_USERNAME=<your username>
 #   pi@raspberrypi$ export NEW_HOSTNAME=<new hostname>
+#   pi@raspberrypi$ export SSH_RPFW_SERVER=<new hostname>
+#   pi@raspberrypi$ export SSH_RPFW_PORT=<new hostname>
+#   pi@raspberrypi$ export SSH_RPFW_HOST_KEY=<new hostname>
 #   pi@raspberrypi$ curl -s https://raw.githubusercontent.com/realglobe-Inc/co2mon/master/setup_raspberrypi.sh | sh -s
 #
 
@@ -22,6 +25,33 @@ sudo usermod -aG docker pi
 mkdir -p /home/pi/.ssh
 curl https://github.com/${GITHUB_USERNAME}.keys > /home/pi/.ssh/authorized_keys
 chmod 600 /home/pi/.ssh/authorized_keys
+
+# ssh鍵ペアの生成
+ssh-keygen -t ed25519 -f /home/pi/.ssh/id_ed25519 -P ''
+
+# sshリバースフォワードの設定
+#if [ -n "${SSH_RPFW_SERVER}" ] && [ -n "${SSH_RPFW_PORT}" ] && [ -n "${SSH_RPFW_HOST_KEY}" ]; then
+if [ -n "${SSH_RPFW_SERVER}" ] && [ -n "${SSH_RPFW_PORT}" ]; then
+  sudo tee /etc/systemd/system/ssh-rpfw.service <<EOF
+[Unit]
+Description=ssh reverse port forwarding service
+After=network.target auditd.service
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi
+ExecStart=/usr/bin/ssh -oExitOnForwardFailure=yes -oTCPKeepAlive=no -N -R ${SSH_RPFW_PORT}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 ${SSH_RPFW_SERVER}
+Restart=always
+RestartSec=1
+StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  sudo systemctl enable ssh-rpfw.service
+fi
+#echo "${SSH_RPFW_HOST_KEY}" | sudo tee /etc/ssh/ssh_known_hosts > /dev/null
 
 # GNU screen
 sudo apt-get update
@@ -170,3 +200,9 @@ EOF
 
 # ホスト名の設定
 sudo raspi-config nonint do_hostname "${NEW_HOSTNAME}"
+
+
+echo ""
+echo "----------------------------"
+echo "${NEW_HOSTNAME} のssh公開鍵:"
+cat ~/.ssh/id_ed25519.pub
