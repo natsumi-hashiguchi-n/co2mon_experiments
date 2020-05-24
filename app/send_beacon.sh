@@ -38,10 +38,21 @@ if [ -z "${info_url}" ] || [ -z "${token}" ]; then
 fi
 
 co2="$(tail -n 1 /var/local/co2mon/DATA/log/co2/latest | cut -d ' ' -f 2 | cut -d '=' -f 2 | tr -d '\r')"
-tail -n 1 /var/local/co2mon/DATA/log/gps_tpv |
-  cut -d ' ' -f 2 |
-  jq '{"lat": .lat, "lng": .lon, "alt": .alt, "direction": 0}' |
-  #jq --arg type "${type}" '. + {"type": $type}' |
+if tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | grep '.'; then
+  lat="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lat)"
+  lng="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lon)"
+  lat="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .alt)"
+elif cat /var/local/co2mon/DATA/location | grep '.'; then
+  lat="$(cat /var/local/co2mon/DATA/location | cut -d ',' -f 1)"
+  lng="$(cat /var/local/co2mon/DATA/location | cut -d ',' -f 2)"
+  alt="$(cat /var/local/co2mon/DATA/location | cut -d ',' -f 3)"
+else
+  lat="0"
+  lng="0"
+  alt="0"
+fi
+
+printf '{"lat": %s, "lng": %s, "alt": %s, "direction": 0}\n' "${lat}" "${lng}" "${alt}" |
   jq --arg type "default" '. + {"type": $type}' |
   jq --arg co2 "${co2}" '. + {"additional": {"info": {"co2": $co2}}}' |
   curl -s -w '\n' -H "Content-type: application/json" -d @- "${info_url}?token=${token}"
