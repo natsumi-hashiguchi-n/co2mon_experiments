@@ -41,7 +41,7 @@ After=network.target auditd.service
 User=pi
 Group=pi
 WorkingDirectory=/home/pi
-ExecStart=/usr/bin/ssh -oExitOnForwardFailure=yes -oTCPKeepAlive=no -N -R ${SSH_RPFW_PORT}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 ${SSH_RPFW_SERVER}
+ExecStart=/usr/bin/ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o TCPKeepAlive=no -N -R 22005:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 -p 50304 debian@160.16.144.226
 Restart=always
 RestartSec=1
 StartLimitBurst=0
@@ -196,6 +196,98 @@ Subsystem       sftp    /usr/lib/openssh/sftp-server
 #       AllowTcpForwarding no
 #       PermitTTY no
 #       ForceCommand cvs server
+EOF
+
+# DHCPクライアントの設定
+sudo tee /etc/dhcpcd.conf > /dev/null <<'EOF'
+hostname
+clientid
+persistent
+option rapid_commit
+option domain_name_servers, domain_name, domain_search, host_name
+option interface_mtu
+require dhcp_server_identifier
+slaac private
+noipv6
+noipv6rs
+static domain_name_servers=8.8.8.8 8.8.4.4
+EOF
+
+# config.txt
+sudo tee /boot/config.txt > /dev/null <<'EOF'
+# For more options and information see
+# http://rpf.io/configtxt
+# Some settings may impact device functionality. See link above for details
+
+# uncomment if you get no picture on HDMI for a default "safe" mode
+#hdmi_safe=1
+
+# uncomment this if your display has a black border of unused pixels visible
+# and your display can output without overscan
+#disable_overscan=1
+
+# uncomment the following to adjust overscan. Use positive numbers if console
+# goes off screen, and negative if there is too much border
+#overscan_left=16
+#overscan_right=16
+#overscan_top=16
+#overscan_bottom=16
+
+# uncomment to force a console size. By default it will be display's size minus
+# overscan.
+#framebuffer_width=1280
+#framebuffer_height=720
+
+# uncomment if hdmi display is not detected and composite is being output
+#hdmi_force_hotplug=1
+
+# uncomment to force a specific HDMI mode (this will force VGA)
+#hdmi_group=1
+#hdmi_mode=1
+
+# uncomment to force a HDMI mode rather than DVI. This can make audio work in
+# DMT (computer monitor) modes
+#hdmi_drive=2
+
+# uncomment to increase signal to HDMI, if you have interference, blanking, or
+# no display
+#config_hdmi_boost=4
+
+# uncomment for composite PAL
+#sdtv_mode=2
+
+#uncomment to overclock the arm. 700 MHz is the default.
+#arm_freq=800
+
+# Uncomment some or all of these to enable the optional hardware interfaces
+#dtparam=i2c_arm=on
+#dtparam=i2s=on
+#dtparam=spi=on
+
+# Uncomment this to enable infrared communication.
+#dtoverlay=gpio-ir,gpio_pin=17
+#dtoverlay=gpio-ir-tx,gpio_pin=18
+
+# Additional overlays and parameters are documented /boot/overlays/README
+
+# Enable audio (loads snd_bcm2835)
+dtparam=audio=on
+
+# g_ether
+dtoverlay=dwc2
+
+[pi4]
+# Enable DRM VC4 V3D driver on top of the dispmanx display stack
+dtoverlay=vc4-fkms-v3d
+max_framebuffers=2
+
+[all]
+#dtoverlay=vc4-fkms-v3d
+EOF
+
+# cmdline.txt
+sudo tee /boot/cmdline.txt > /dev/null <<'EOF'
+modules-load=dwc2,g_ether console=serial0,115200 console=tty1 root=PARTUUID=738a4d67-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
 EOF
 
 # ホスト名の設定
