@@ -92,8 +92,26 @@ docker exec -it co2mon /bin/bash --login
 ./docker_build.sh && (docker run --rm -v $(pwd)/TMP:/workdir/TMP -v $(pwd)/DATA:/var/local/co2mon/DATA co2mon sh -x /workdir/app/send_graph.sh)
 ```
 
+## デバイスの紐付け
+
+```sh
+./pair_remote_device_to_heceye.sh cmXX "https://demo.hec-eye.jp/a/8040143637dbXXXX"
+```
+
+RPi上で実行する場合は、
+
+```sh
+docker run --rm -v /var/local/co2mon:/var/local/co2mon co2mon sh -c '/workdir/app/get_endpoint_info.sh https://demo.hec-eye.jp/a/XXXXXXXXXXXXXX > /var/local/co2mon/DATA/endpoint_info'
+```
+
+
 ## 位置情報を手動で設定
 
+```sh
+./update_remote_device_location.sh cmXX 35.72XXX,139.76XXX,0
+```
+
+RPi上で実行する場合は、
 `/var/local/co2mon/DATA/location`に`lat,lng,alt`の形式で書き込む
 
 ```sh
