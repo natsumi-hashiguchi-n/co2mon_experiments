@@ -100,6 +100,12 @@ docker exec -it co2mon /bin/bash --login
 echo '35.73237,139.76728,0' | sudo tee /var/local/co2mon/DATA/location
 ```
 
+## Dockerコンテナにps,pingなどをいれる
+
+```sh
+apt-get update && apt-get -y install procps iputils-ping iproute2
+```
+
 ## USBコネクタ
 
 - 左右はコネクタ側から見たときの左右
