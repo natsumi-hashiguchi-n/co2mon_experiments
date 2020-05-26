@@ -14,4 +14,4 @@ set -eu
 : ${target}
 : ${location}
 
-echo "${location}" | ssh "${target}" sudo tee /var/local/co2mon/DATA/location
+ssh "${target}" "sudo mkdir -p /var/local/co2mon/DATA && echo \"${location}\" | sudo tee /var/local/co2mon/DATA/location"
