@@ -52,7 +52,7 @@ else
   alt="0"
 fi
 
-printf '{"lat": %s, "lng": %s, "alt": %s, "direction": 0}\n' "${lat}" "${lng}" "${alt}" |
+printf '{"lat": %s, "lng": %s, "alt": %s}\n' "${lat}" "${lng}" "${alt}" |
   jq --arg type "default" '. + {"type": $type}' |
   jq --arg co2 "${co2}" '. + {"additional": {"info": {"co2": $co2}}}' |
   curl -s -w '\n' -H "Content-type: application/json" -d @- "${info_url}?token=${token}"
