@@ -1,8 +1,9 @@
 #!/bin/sh
 
-ENDPOINT_INFO="/var/local/co2mon/DATA/endpoint_info"
-
 set -eu
+
+DATA="/var/local/co2mon/DATA"
+ENDPOINT_INFO="${DATA}/endpoint_info"
 
 on_exit() {
   :
@@ -25,6 +26,7 @@ trap error_handler EXIT
 # ここで通常の処理
 pairing_url="${1}"
 
+mkdir -p "${DATA}"
 /workdir/app/get_endpoint_info.sh "${pairing_url}" > "${ENDPOINT_INFO}"
 cat "${ENDPOINT_INFO}"
 
