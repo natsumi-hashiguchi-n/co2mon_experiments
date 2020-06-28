@@ -21,10 +21,9 @@ docker buildx inspect --bootstrap  # 最初の1回のみ
 microSDの書き込み
 
 ```sh
-diskutil unmountDisk /dev/disk2
-sudo dd if=~/Downloads/2020-02-13-raspbian-buster-lite.img of=/dev/rdisk2 bs=1m; say 'オワッタヨ'
-touch /Volumes/boot/ssh
-diskutil eject /dev/disk2
+wget http://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip
+unzip 2020-05-27-raspios-buster-lite-armhf.zip
+./write_sd.sh
 ```
 
 起動してシェルログインできたら、以下のコマンドを実行する。

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-image="${HOME}/Downloads/2020-02-13-raspbian-buster-lite.img"
+#image="${HOME}/Downloads/2020-05-27-raspios-buster-lite-armhf.img"
+image="./2020-05-27-raspios-buster-lite-armhf.img"
 
 sudo printf ''  # sudoをいちどキックしておく
 
