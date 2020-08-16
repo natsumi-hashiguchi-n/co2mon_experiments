@@ -35,7 +35,7 @@ jq -h > /dev/null 2>&1 || error 'jq が見つかりません'
 
 endpoint_info="/var/local/co2mon/DATA/endpoint_info"
 image_url="$(cat "${endpoint_info}" | grep 'imageUrl: ' | cut -d ' ' -f 2 | tr -d '\r')"
-name="$(cat "${endpoint_info}" | grep 'name: ' | cut -d ' ' -f 2 | tr -d '\r')"
+name="$(cat "${endpoint_info}" | grep 'name: ' | cut -d ' ' -f 2- | tr -d '\r')"
 token="$(cat "${endpoint_info}" | grep '^token: ' | cut -d ' ' -f 2 | tr -d '\r')"
 #if [ -z "${info_url}" ] || [ -z "${token}" ]; then
 if [ -z "${image_url}" ] || [ -z "${token}" ]; then
