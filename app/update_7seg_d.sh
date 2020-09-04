@@ -2,5 +2,5 @@
 
 while :; do
   /workdir/app/update_7seg.sh
-  sleep 10
+  sleep 1
 done
