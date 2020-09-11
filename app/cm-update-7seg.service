@@ -1,5 +1,5 @@
 [Unit]
-Description=co2mon beacon sending service
+Description=co2mon 7seg updating service
 After=network.target auditd.service cm-read.service
 
 [Service]
