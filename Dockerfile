@@ -30,5 +30,9 @@ RUN systemctl enable cm-send-beacon.service
 COPY ./app/cm-send-graph.service /etc/systemd/system/
 RUN systemctl enable cm-send-graph.service
 
+## CO2濃度表示サービスの設定
+COPY ./app/cm-update-7seg.service /etc/systemd/system/
+RUN systemctl enable cm-update-7seg.service
+
 STOPSIGNAL SIGRTMIN+3
 CMD [ "/sbin/init" ]
