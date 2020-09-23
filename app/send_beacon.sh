@@ -37,7 +37,7 @@ if [ -z "${info_url}" ] || [ -z "${token}" ]; then
   error 'endpoint_info が正しくありません'
 fi
 
-co2="$(tail -n 1 /var/local/co2mon/DATA/log/co2/latest | cut -d ' ' -f 2 | cut -d '=' -f 2 | tr -d '\r')"
+co2="$(tail -n 1 /var/local/co2mon/DATA/log/co2/latest | cut -d ' ' -f 2 | cut -d '=' -f 2 | cut -d ';' -f 1 | tr -d '\r')"
 if tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | grep '.'; then
   lat="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lat)"
   lng="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lon)"
