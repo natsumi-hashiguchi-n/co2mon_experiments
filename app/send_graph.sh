@@ -43,9 +43,6 @@ if [ -z "${image_url}" ] || [ -z "${token}" ]; then
 fi
 
 ## 過去6時間ぶんのCO2濃度履歴を取得する
-#tail -n 22000 /var/local/co2mon/DATA/log/co2/latest |
-#  awk -v pt="$((date - 21600))" '$1 > pt' |
-#  sed 's/ co2=/ /g' > "${tmp}"/co2_last_6h.timet_ppm
 tail -n 22000 /var/local/co2mon/DATA/log/co2/latest |
   tr -d '\r' |
   awk -v pt="$((date - 21600))" '$1 > pt' |

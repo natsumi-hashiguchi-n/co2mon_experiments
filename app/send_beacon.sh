@@ -37,25 +37,17 @@ if [ -z "${info_url}" ] || [ -z "${token}" ]; then
   error 'endpoint_info が正しくありません'
 fi
 
-#co2="$(tail -n 1 /var/local/co2mon/DATA/log/co2/latest | cut -d ' ' -f 2 | cut -d '=' -f 2 | tr -d '\r')"
 co2="$(tail -n 1 /var/local/co2mon/DATA/log/co2/latest |
   cut -d ' ' -f 2 |
   tr -d '\r' |
   sed -n 's/\(^.*\)\(co2=\)\([0-9][0-9]*\)\(.*$\)/\3/p')"
-#if tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | grep '.'; then
-#latest_gps_tpv="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv)"
 latest_gps_tpv="$(tail -n 10800 /var/local/co2mon/DATA/log/gps_tpv |
   cut -f 2- -d ' ' |
   jq -c 'select(.lat != null and .lon != null)' |
   tail -n 1)"
-#if echo "${latest_gps_tpv}" | cut -f 2- -d ' ' | jq -r '.lat' | grep '^[0-9][0-9]*\.[0-9][0-9]*$'; then
 if [ -n "${latest_gps_tpv}" ]; then
-  #lat="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lat)"
-  #lng="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .lon)"
-  #lat="$(tail -n 1 /var/local/co2mon/DATA/log/gps_tpv | cut -d ' ' -f 2 | jq -r .alt)"
   lat="$(echo "${latest_gps_tpv}" | jq -r .lat)"
   lng="$(echo "${latest_gps_tpv}" | jq -r .lon)"
-  #alt="$(echo "${latest_gps_tpv}" | jq -r .alt)"
   alt="$(echo "${latest_gps_tpv}" | jq -r .alt | grep -v 'null' | grep '.' || echo 0.0)"
 elif cat /var/local/co2mon/DATA/location | grep '.'; then
   lat="$(cat /var/local/co2mon/DATA/location | cut -d ',' -f 1)"
