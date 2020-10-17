@@ -50,7 +50,7 @@ trap error_handler EXIT
 checkfile /boot/setup/hostname
 checkfile /boot/setup/ssh_keys
 
-new_hostname="$(/boot/setup/hostname)"
+new_hostname="$(cat /boot/setup/hostname)"
 
 # Docker
 curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
