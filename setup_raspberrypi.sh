@@ -379,8 +379,8 @@ sudo raspi-config nonint do_hostname "${new_hostname}"
 #echo "${new_hostname} のssh公開鍵:"
 #cat ~/.ssh/id_ed25519.pub
 
-echo "セットアップが完了しました。10秒後に再起動します"
-sudo shutdown -r +10
+echo "セットアップが完了しました。再起動します"
+sudo shutdown -r now
 
 # 異常終了時ハンドラの解除
 trap '' EXIT
