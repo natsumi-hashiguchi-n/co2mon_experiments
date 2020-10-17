@@ -12,28 +12,77 @@
 #   pi@raspberrypi$ curl -s https://raw.githubusercontent.com/realglobe-Inc/co2mon/master/setup_raspberrypi.sh | sh -s
 #
 
+
+cmdname=$(basename "${0}")
+
+checkfile() {
+  test -s "${1}" || error "${1} が存在しないか空です"
+}
+
+error() {
+  error_message "${1}"
+  exit 1
+}
+
+error_handler() {
+  error_message "不明なエラー"
+}
+
+error_message() {
+  printf '\e[31m%s: エラー: %s\e[m\n' "${cmdname}" "${1}" 1>&2
+  printf '\e[31m%s: 終了します\e[m\n' "${cmdname}" 1>&2
+}
+
+# 1箇所でもエラー終了するコマンドがあればスクリプトを終了する
+# その場合, error_handler を実行する
 set -eu
+trap error_handler EXIT
+
+#
+# ↓ここから通常時の処理↓
+#
 
 # 環境変数チェック
-: ${GITHUB_USERNAME}
-: ${NEW_HOSTNAME}
+#: ${GITHUB_USERNAME}
+#: ${NEW_HOSTNAME}
+
+# ファイルの存在確認
+checkfile /boot/setup/hostname
+checkfile /boot/setup/ssh_keys
+
+new_hostname="$(/boot/setup/hostname)"
 
 # Docker
 curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
 sudo sh /tmp/get-docker.sh
 sudo usermod -aG docker pi
 
-# ssh
+# ssh鍵認証の設定
 mkdir -p /home/pi/.ssh
-curl https://github.com/${GITHUB_USERNAME}.keys > /home/pi/.ssh/authorized_keys
+cp /boot/setup/ssh_keys /home/pi/.ssh/authorized_keys
 chmod 600 /home/pi/.ssh/authorized_keys
 
-# ssh鍵ペアの生成
-ssh-keygen -t ed25519 -f /home/pi/.ssh/id_ed25519 -P ''
-
 # sshリバースフォワードの設定
-#if [ -n "${SSH_RPFW_SERVER-}" ] && [ -n "${SSH_RPFW_PORT-}" ]; then
-if [ -n "${SSH_RPFW_SERVER-}" ] && [ -n "${SSH_RPFW_SERVER_PORT-}" ] && [ -n "${SSH_RPFW_PORT-}" ] && [ -n "${SSH_RPFW_HOST_KEY-}" ] && [ -n "${SSH_RPFW_HOST_KEY_TYPE-}" ]; then
+# /boot/setup/ssh_rpfw が存在する場合はリバースフォワードの設定を行う
+if [ -d /boot/setup/ssh_rpfw ]; then
+  ssh_rpfw_dir="/boot/setup/ssh_rpfw"
+
+  # ファイルの存在確認
+  checkfile "${ssh_rpfw_dir}"/id_ed25519
+  checkfile "${ssh_rpfw_dir}"/id_ed25519.pub
+  checkfile "${ssh_rpfw_dir}"/rpfw_port
+  checkfile "${ssh_rpfw_dir}"/rpfw_server
+  checkfile "${ssh_rpfw_dir}"/rpfw_server_port
+  checkfile "${ssh_rpfw_dir}"/rpfw_server_user
+  checkfile "${ssh_rpfw_dir}"/rpfw_server_key
+
+  rpfw_port="$(cat ${ssh_rpfw_dir}/rpfw_port)"
+  rpfw_server="$(cat ${ssh_rpfw_dir}/rpfw_server)"
+  rpfw_server_port="$(cat ${ssh_rpfw_dir}/rpfw_server_port)"
+  rpfw_server_user="$(cat ${ssh_rpfw_dir}/rpfw_server_user)"
+  rpfw_server_key="$(cat ${ssh_rpfw_dir}/rpfw_server_key)"
+
+  # serviceファイルの作成
   sudo tee /etc/systemd/system/ssh-rpfw.service <<EOF
 [Unit]
 Description=ssh reverse port forwarding service
@@ -43,7 +92,7 @@ After=network.target auditd.service
 User=pi
 Group=pi
 WorkingDirectory=/home/pi
-ExecStart=/usr/bin/ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o TCPKeepAlive=no -N -R ${SSH_RPFW_PORT}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 -p ${SSH_RPFW_SERVER_PORT} debian@${SSH_RPFW_SERVER}
+ExecStart=/usr/bin/ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o TCPKeepAlive=no -N -R ${rpfw_port}:127.0.0.1:22 -i /home/pi/.ssh/id_ed25519 -p ${rpfw_server_port} ${rpfw_server_user}@${rpfw_server}
 Restart=always
 RestartSec=1
 StartLimitBurst=0
@@ -51,8 +100,18 @@ StartLimitBurst=0
 [Install]
 WantedBy=multi-user.target
 EOF
+
+  # サービスの有効化
   sudo systemctl enable ssh-rpfw.service
-  printf '[%s]:%s %s %s\n' "${SSH_RPFW_SERVER}" "${SSH_RPFW_SERVER_PORT}" "${SSH_RPFW_HOST_KEY_TYPE}" "${SSH_RPFW_HOST_KEY}" | sudo tee /etc/ssh/ssh_known_hosts > /dev/null
+
+  # known_hosts ファイルにリバースフォワードサーバの公開鍵を登録する
+  printf '[%s]:%s %s\n' "${rpfw_server}" "${rpfw_server_port}" "${rpfw_server_key}" | sudo tee /etc/ssh/ssh_known_hosts > /dev/null
+
+  # 鍵ペアのコピー
+  cp "${ssh_rpfw_dir}"/id_ed25519 ~/.ssh
+  chmod 600 ~/.ssh/id_ed25519
+  cp "${ssh_rpfw_dir}"/id_ed25519.pub ~/.ssh
+  chmod 644 ~/.ssh/id_ed25519.pub
 fi
 
 # GNU screen
@@ -292,30 +351,36 @@ EOF
 #modules-load=dwc2,g_ether console=serial0,115200 console=tty1 root=PARTUUID=738a4d67-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
 #EOF
 
-# co2mon
-sudo tee /etc/systemd/system/co2mon.service > /dev/null <<'EOF'
-[Unit]
-Description=co2mon container service
-After=network.target auditd.service
-
-[Service]
-#WorkingDirectory=/workdir
-ExecStart=docker run --privileged --rm -v /var/local/co2mon:/var/local/co2mon --name co2mon co2mon /sbin/init
-ExecStop=docker stop co2mon
-Restart=always
-RestartSec=1
-StartLimitBurst=0
-
-[Install]
-WantedBy=multi-user.target
-EOF
-sudo systemctl enable co2mon.service
+## co2mon
+#sudo tee /etc/systemd/system/co2mon.service > /dev/null <<'EOF'
+#[Unit]
+#Description=co2mon container service
+#After=network.target auditd.service
+#
+#[Service]
+##WorkingDirectory=/workdir
+#ExecStart=docker run --privileged --rm -v /dev:/dev -v /var/local/co2mon:/var/local/co2mon --name co2mon co2mon /sbin/init
+#ExecStop=docker stop co2mon
+#Restart=always
+#RestartSec=1
+#StartLimitBurst=0
+#
+#[Install]
+#WantedBy=multi-user.target
+#EOF
+#sudo systemctl enable co2mon.service
 
 # ホスト名の設定
-sudo raspi-config nonint do_hostname "${NEW_HOSTNAME}"
+sudo raspi-config nonint do_hostname "${new_hostname}"
 
 
-echo ""
-echo "----------------------------"
-echo "${NEW_HOSTNAME} のssh公開鍵:"
-cat ~/.ssh/id_ed25519.pub
+#echo ""
+#echo "----------------------------"
+#echo "${new_hostname} のssh公開鍵:"
+#cat ~/.ssh/id_ed25519.pub
+
+echo "セットアップが完了しました。10秒後に再起動します"
+sudo shutdown -r +10
+
+# 異常終了時ハンドラの解除
+trap '' EXIT
