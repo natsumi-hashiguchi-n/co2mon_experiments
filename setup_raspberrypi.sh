@@ -351,25 +351,6 @@ EOF
 #modules-load=dwc2,g_ether console=serial0,115200 console=tty1 root=PARTUUID=738a4d67-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
 #EOF
 
-## co2mon
-#sudo tee /etc/systemd/system/co2mon.service > /dev/null <<'EOF'
-#[Unit]
-#Description=co2mon container service
-#After=network.target auditd.service
-#
-#[Service]
-##WorkingDirectory=/workdir
-#ExecStart=docker run --privileged --rm -v /dev:/dev -v /var/local/co2mon:/var/local/co2mon --name co2mon co2mon /sbin/init
-#ExecStop=docker stop co2mon
-#Restart=always
-#RestartSec=1
-#StartLimitBurst=0
-#
-#[Install]
-#WantedBy=multi-user.target
-#EOF
-#sudo systemctl enable co2mon.service
-
 # ホスト名の設定
 sudo raspi-config nonint do_hostname "${new_hostname}"
 
