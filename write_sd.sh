@@ -73,6 +73,12 @@ if [ "${FLG_p}" = "TRUE" ] || [ "${FLG_r}" = "TRUE" ] || [ "${FLG_P}" = "TRUE" ]
   fi
 fi
 
+# ssh_keys の存在確認
+if ! [ -f "./ssh_keys" ]; then
+  echo "./ssh_keys が存在しません" >&2
+  exit 1
+fi
+
 # sudoをいちどキックしておく
 echo "microSDに書き込むためにsudoのパスワードを入力してください"
 sudo printf ''  
@@ -117,9 +123,7 @@ cp ./setup_raspberrypi.sh "${setup_dir}"
 echo "${hostname}" > "${setup_dir}"/hostname
 
 # 公開鍵のコピー
-if [ -f "./ssh_keys" ]; then
-  cp ssh_keys "${setup_dir}"/ssh_keys
-fi
+cp ./ssh_keys "${setup_dir}"/ssh_keys
 
 # ssh_rpfwの設定
 if [ -n "${rpfw_port}" ] && [ -n "${rpfw_server}" ] && [ -n "${rpfw_server_port}" ] && [ -n "${rpfw_server_user}" ] && [ -n "${rpfw_server_key}" ]; then
