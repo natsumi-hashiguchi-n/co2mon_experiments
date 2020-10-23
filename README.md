@@ -11,6 +11,8 @@ Hec-EyeにつながるCO2モニタ
 microSDの書き込みを行う。
 
 ```sh
+# 自分のssh公開鍵を ssh_keys に書き込んでおく
+cat ~/.ssh/id_ed25519.pub >> ssh_keys
 # LANの同一セグメントから <ホスト名>.local でアクセスのみ行う場合
 ./write_sd.sh <ホスト名>
 # リバースフォワードサーバを使う場合
