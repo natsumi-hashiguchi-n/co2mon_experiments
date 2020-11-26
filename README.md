@@ -4,6 +4,19 @@
 
 Hec-EyeにつながるCO2モニタ
 
+## 必要なハードウェア
+
+- RaspberryPi 4
+- [usb_co2](https://github.com/realglobe-Inc/usb_co2)
+- [usb_7seg](https://github.com/realglobe-Inc/usb_7seg)
+- PIX-MT100
+  - セルラー回線（LTE）で使用する場合のみ
+- USB接続のGPS受信機
+  - 車載の場合など、移動しながら使用する場合のみ
+  - [GU-902MGG-USB](https://akizukidenshi.com/catalog/g/gM-14541/)が動作確認済
+- モバイルバッテリー
+  - 車載の場合など、移動しながら使用する場合のみ
+
 ## デプロイ
 
 ### RaspberryPiのセットアップ
@@ -58,6 +71,11 @@ brew install pv  # 最初の1回のみ
 # 例
 ./deploy.sh pi@co2mon.local https://demo.hec-eye.jp/a/625c2d59bXXXXXXXX 35.70161 139.75318
 ```
+
+## co2monを使用しているプロジェクト
+
+- [Project AIRNORM](https://scrapbox.io/realglobe/Project_AIRNORM)
+
 
 ## 開発
 
